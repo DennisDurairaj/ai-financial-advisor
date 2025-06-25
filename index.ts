@@ -5,6 +5,14 @@ const client = new OpenAI({
   apiKey: process.env.OPEN_AI_KEY as string,
 });
 
+const ollamaClient = new OpenAI({
+  apiKey: process.env.OLLAMA_API_KEY as string,
+  baseURL: "http://localhost:3000/api",
+  defaultHeaders: {
+    Authorization: `Bearer ${process.env.OLLAMA_API_KEY}`,
+  },
+});
+
 interface Section {
   headline: string;
   content: string;
@@ -102,14 +110,19 @@ function userPromptFor(website: Website) {
 
 async function getAdvice(url: string) {
   const website = await Website.create(url);
-  const response = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPromptFor(website) },
-    ],
-  });
-  return response.choices[0]?.message.content;
+  try {
+    const response = await ollamaClient.chat.completions.create({
+      model: "llama3.2:latest",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPromptFor(website) },
+      ],
+    });
+
+    return response.choices[0]?.message.content;
+  } catch (error) {
+    console.error("Error fetching advice:", error);
+  }
 }
 
 await getAdvice("https://finance.yahoo.com/topic/latest-news/").then(
