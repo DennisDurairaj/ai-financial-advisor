@@ -1,0 +1,16 @@
+{
+  "name": "ai-financial-advisor",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "node-html-parser": "^7.0.1",
+    "openai": "^5.7.0"
+  }
+}
